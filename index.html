@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo API Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.35;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 36px;
+        }
+        h3 {
+            font-size: 20px;
+        }
+        #header {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("https://images.pexels.com/photos/10070064/pexels-photo-10070064.jpeg?auto=compress&cs=tinysrgb&fit=crop&fp-y=0.5&h=500&sharp=20&w=1400");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: white;
+            padding: 14em 0;
+        }
+        #header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 650px;
+            margin: auto;
+        }
+        #header-title {
+            display: block;
+            width: 95%;
+            margin-bottom: 16px;
+        }
+        #search-form {
+            width: 95%;
+        }
+        #search-bar {
+            padding: 18px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            cursor: text;
+        }
+        #photo-feed-container {
+            margin: 0 auto;
+            padding: 0 1em;
+            column-count: 2;
+        }
+        #search-results-title {
+            margin: 1em auto;
+            width: 95%;
+        }
+        .image-container {
+            margin-bottom: 1em;
+        }
+        .photo {
+            width: 100%;
+        }
+        @media (min-width: 1080px) {
+            #photo-feed-container {
+                column-count: 3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div id="header-content">
+            <h1 id="header-title">The best free stock photos, royalty free images & videos shared by creators.</h1>
+            <form id="search-form">
+                <input type="text" id="search-bar" placeholder="Search for free photos and videos">
+            </form>
+        </div>
+    </div>
+    <div id="search-results-container"></div>
+    <script
+    src="https://code.jquery.com/jquery-3.6.0.js"
+    integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+    <script>
+         $("#search-form").on('submit', function(e){
+            e.preventDefault();
+            $("#search-results-container").html("");
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var data = JSON.parse(xhttp.responseText);
+                    console.log(data.photos);
+                    $('#search-results-container').append(`
+                        <div>
+                            <h3 id="search-results-title">Photos of ${searchValueCapitalized}</h3>
+                        </div>
+                        <div id="photo-feed-container"></div>
+                    `);    
+                    data.photos.forEach(photo => {
+                        $('#photo-feed-container').append(`
+                            <div class="image-container">
+                                <a href=${photo.url}><img class="photo" src=${photo.src.original}></a>
+                            </div>
+                        `);    
+                    });
+                    
+                }
+            };
+            var searchValue = $("#search-bar").val();
+            var searchValueCapitalized = searchValue[0].toUpperCase() + searchValue.slice(1).toLowerCase();
+            xhttp.open("GET", `https://api.pexels.com/v1/search?query=${searchValue}`, true);
+            xhttp.setRequestHeader('Authorization', '563492ad6f91700001000001bee2abb0561b42a1b99bf60215fce3cc')
+            xhttp.send();
+        })
+    </script>
+    
+</body>
+</html>
